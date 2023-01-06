@@ -1,3 +1,7 @@
+use std::iter::Sum;
+
+use itertools::{any, sorted, Itertools};
+
 pub fn part_one(input: &str) -> Option<u32> {
     // iterate through each line,
     // sum as we go
@@ -22,7 +26,25 @@ pub fn part_one(input: &str) -> Option<u32> {
 }
 
 pub fn part_two(input: &str) -> Option<u32> {
-    None
+    let lines = input.lines();
+    let mut max_calories: [usize; 3] = [0, 0, 0];
+    let mut sum: usize = 0;
+    for line in lines {
+        if line.is_empty() {
+            if any(max_calories, |i| sum > i) {
+                max_calories.sort();
+                max_calories[0] = sum;
+            }
+            sum = 0;
+            continue;
+        }
+        sum += line.parse::<usize>().unwrap();
+    }
+    if any(max_calories, |i| sum > i) {
+        max_calories.sort();
+        max_calories[0] = sum;
+    }
+    Some(max_calories.iter().sum::<usize>().try_into().unwrap())
 }
 
 fn main() {
@@ -44,6 +66,6 @@ mod tests {
     #[test]
     fn test_part_two() {
         let input = advent_of_code::read_file("examples", 1);
-        assert_eq!(part_two(&input), None);
+        assert_eq!(part_two(&input), Some(45000));
     }
 }
